@@ -2,7 +2,7 @@ import os
 import codecs
 
 
-def read_in(folder) -> list[str]:
+def read_in(folder: str) -> list[str]:
     absolute_path = os.path.join(os.getcwd(), folder)
     files: list[str] = os.listdir(absolute_path)
     a_list: list[str] = []
