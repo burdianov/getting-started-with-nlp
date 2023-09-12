@@ -1,5 +1,6 @@
 import os
 import codecs
+import random
 
 
 def read_in(folder: str) -> list[str]:
@@ -27,3 +28,10 @@ print(len(ham_list))
 
 print(spam_list[0])
 print(ham_list[0])
+
+all_emails = [(email_content, "spam") for email_content in spam_list]
+all_emails += [(email_content, "ham") for email_content in ham_list]
+
+random.seed(42)
+random.shuffle(all_emails)
+print(f"Dataset size = {str(len(all_emails))} emails")
