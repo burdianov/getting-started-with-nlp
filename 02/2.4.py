@@ -94,3 +94,31 @@ print("STOCKS in HAM:")
 concordance(ham_list, "stocks")
 print("\n\nSTOCKS in SPAM:")
 concordance(spam_list, "stocks")
+
+test_spam_list = ["Participate in our new lottery!", "Try out this new medicine"]
+test_ham_list = [
+    "See the minutes from the last meeting attached",
+    "Investors are coming to our office on Monday",
+]
+
+test_emails = [(email_content, "spam") for email_content in test_spam_list]
+test_emails += [(email_content, "ham") for email_content in test_ham_list]
+
+new_test_set = [(get_features(email), label) for (email, label) in test_emails]
+
+evaluate(train_set, new_test_set, classifier)
+
+for email in test_spam_list:
+    print(email)
+    print(classifier.classify(get_features(email)))
+for email in test_ham_list:
+    print(email)
+    print(classifier.classify(get_features(email)))
+
+while True:
+    email = input("Type in your email here (or press 'Enter'): ")
+    if len(email) == 0:
+        break
+    else:
+        prediction = classifier.classify(get_features(email))
+        print(f"This email is likely {prediction}\n")
