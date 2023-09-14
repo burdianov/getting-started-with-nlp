@@ -1,2 +1,0 @@
-Subject: temp forecast model. Xls
-This is the file with our city temperature weights.
