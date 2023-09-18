@@ -1,5 +1,5 @@
 def read_mappings():
-    f = open("datasets/CISI.REL")
+    f = open("../datasets/CISI/CISI.REL")
 
     mappings = {}
 

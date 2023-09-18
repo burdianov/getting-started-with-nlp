@@ -1,5 +1,5 @@
 def read_queries():
-    f = open("datasets/CISI.QRY")
+    f = open("../datasets/CISI/CISI.QRY")
     merged = ""
 
     for a_line in f.readlines():

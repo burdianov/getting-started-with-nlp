@@ -1,5 +1,5 @@
 def read_documents():
-    f = open("datasets/CISI.ALL")
+    f = open("../datasets/CISI/CISI.ALL")
     merged = ""
 
     for a_line in f.readlines():
