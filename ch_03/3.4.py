@@ -1,7 +1,11 @@
+import string
+
 import nltk
 from nltk import word_tokenize
+from nltk.corpus import stopwords
 
 # nltk.download("punkt")
+# nltk.download("stopwords")
 
 
 def read_documents():
@@ -131,3 +135,17 @@ docs = retrieve_documents(doc_words, qry_words.get("3"))
 
 print(docs[:100])
 print(len(docs))
+
+
+def process(text: str):
+    stoplist = set(stopwords.words("english"))
+    word_list = [
+        word
+        for word in word_tokenize(text.lower())
+        if not word in stoplist and not word in string.punctuation
+    ]
+    return word_list
+
+
+word_list = process(documents.get("1"))
+print(word_list)
