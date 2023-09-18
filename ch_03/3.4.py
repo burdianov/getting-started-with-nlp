@@ -3,6 +3,7 @@ import string
 import nltk
 from nltk import word_tokenize
 from nltk.corpus import stopwords
+from nltk.stem.lancaster import LancasterStemmer
 
 # nltk.download("punkt")
 # nltk.download("stopwords")
@@ -139,13 +140,16 @@ print(len(docs))
 
 def process(text: str):
     stoplist = set(stopwords.words("english"))
+    st = LancasterStemmer()
     word_list = [
-        word
+        st.stem(word)
         for word in word_tokenize(text.lower())
         if not word in stoplist and not word in string.punctuation
     ]
     return word_list
 
 
-word_list = process(documents.get("1"))
+word_list = process(documents.get("27"))
+print(word_list)
+word_list = process("organize, organizing, organizational, organ, organic, organizer")
 print(word_list)
