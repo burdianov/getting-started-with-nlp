@@ -1,5 +1,6 @@
 import string
 import math
+from operator import itemgetter
 
 import nltk
 from nltk import word_tokenize
@@ -260,3 +261,38 @@ def vectorize_idf(input_terms: dict, input_idfs, vocabulary: list):
 doc_vectors = vectorize_idf(doc_terms, doc_idfs, all_terms)  # F
 print(len(doc_vectors))
 print(len(doc_vectors.get("1460")))
+
+
+def length(vector: list):
+    sq_length = 0
+    for index in range(0, len(vector)):
+        sq_length += math.pow(vector[index], 2)
+    return math.sqrt(sq_length)
+
+
+def dot_product(vector1, vector2):
+    if len(vector1) == len(vector2):
+        dot_prod = 0
+        for index in range(0, len(vector1)):
+            if not vector1[index] == 0 and not vector2[index] == 0:
+                dot_prod += vector1[index] * vector2[index]
+        return dot_prod
+    else:
+        return "Unmatching dimensionality"
+
+
+def calculate_cosine(query, document):
+    cosine = dot_product(query, document) / length(query) * length(document)
+    return cosine
+
+
+query = qry_vectors.get("3")
+results = {}
+
+for doc_id in doc_vectors.keys():
+    document = doc_vectors.get(doc_id)
+    cosine = calculate_cosine(query, document)
+    results[doc_id] = cosine
+
+for items in sorted(results.items(), key=itemgetter(1), reverse=True)[:44]:
+    print(items[0])
