@@ -1,4 +1,5 @@
 import string
+import math
 
 import nltk
 from nltk import word_tokenize
@@ -153,3 +154,109 @@ word_list = process(documents.get("27"))
 print(word_list)
 word_list = process("organize, organizing, organizational, organ, organic, organizer")
 print(word_list)
+
+
+def get_terms(text: str):
+    stoplist = set(stopwords.words("english"))
+    terms = {}
+    st = LancasterStemmer()
+    word_list = [
+        st.stem(word)
+        for word in word_tokenize(text.lower())
+        if not word in stoplist and not word in string.punctuation
+    ]
+    for word in word_list:
+        terms[word] = terms.get(word, 0) + 1
+    return terms
+
+
+doc_terms = {}
+qry_terms = {}
+for doc_id in documents.keys():
+    doc_terms[doc_id] = get_terms(documents.get(doc_id))
+for qry_id in queries.keys():
+    qry_terms[qry_id] = get_terms(queries.get(qry_id))
+
+print(len(doc_terms))
+print(doc_terms.get("1"))
+print(len(doc_terms.get("1")))
+print(len(qry_terms))
+print(qry_terms.get("1"))
+print(len(qry_terms.get("1")))
+
+
+def collect_vocabulary():
+    all_terms = []
+    for doc_id in doc_terms.keys():
+        for term in doc_terms.get(doc_id).keys():
+            all_terms.append(term)
+    for qry_id in qry_terms.keys():
+        for term in qry_terms.get(qry_id).keys():
+            all_terms.append(term)
+    return sorted(set(all_terms))
+
+
+all_terms = collect_vocabulary()
+print(len(all_terms))
+print(all_terms[:10])
+
+
+def vectorize(input_features: dict, vocabulary: list):
+    output = {}
+    for item_id in input_features.keys():
+        features = input_features.get(item_id)
+        output_vector = []
+        for word in vocabulary:
+            if word in features.keys():
+                output_vector.append(int(features.get(word)))
+            else:
+                output_vector.append(0)
+        output[item_id] = output_vector
+    return output
+
+
+doc_vectors = vectorize(doc_terms, all_terms)
+qry_vectors = vectorize(qry_terms, all_terms)
+
+print(len(doc_vectors))
+print(len(doc_vectors.get("1460")))
+print(len(qry_vectors))
+print(len(qry_vectors.get("112")))
+
+
+def calculate_idfs(vocabulary: list, doc_features: dict):
+    doc_idfs = {}
+    for term in vocabulary:
+        doc_count = 0
+        for doc_id in doc_features.keys():
+            terms = doc_features.get(doc_id)
+            if term in terms.keys():
+                doc_count += 1
+        doc_idfs[term] = math.log(
+            float(len(doc_features.keys())) / float(1 + doc_count), 10
+        )
+    return doc_idfs
+
+
+doc_idfs = calculate_idfs(all_terms, doc_terms)
+print(len(doc_idfs))
+print(doc_idfs.get("system"))
+
+
+def vectorize_idf(input_terms: dict, input_idfs, vocabulary: list):
+    output = {}
+    for item_id in input_terms.keys():
+        terms = input_terms.get(item_id)
+        output_vector = []
+        for term in vocabulary:
+            if term in terms.keys():
+                output_vector.append(input_idfs.get(term) * float(terms.get(term)))
+            else:
+                output_vector.append(float(0))
+        output[item_id] = output_vector
+    return output
+
+
+doc_vectors = vectorize_idf(doc_terms, doc_idfs, all_terms)  # F
+print(len(doc_vectors))
+print(len(doc_vectors.get("1460")))
