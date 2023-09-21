@@ -296,3 +296,67 @@ for doc_id in doc_vectors.keys():
 
 for items in sorted(results.items(), key=itemgetter(1), reverse=True)[:44]:
     print(items[0])
+
+
+def calculate_precision(model_output, gold_standard):
+    true_pos = 0
+    for item in model_output:
+        if item in gold_standard:
+            true_pos += 1
+    return float(true_pos) / float(len(model_output))
+
+
+def calculate_found(model_output, gold_standard):
+    found = 0
+    for item in model_output:
+        if item in gold_standard:
+            found = 1
+    return float(found)
+
+
+precision_all = 0.0
+found_all = 0.0
+
+for query_id in mappings.keys():
+    gold_standard = mappings.get(str(query_id))
+    query = qry_vectors.get(str(query_id))
+    results = {}
+    model_output = []
+    for doc_id in doc_vectors.keys():
+        document = doc_vectors.get(doc_id)
+        cosine = calculate_cosine(query, document)
+        results[doc_id] = cosine
+    for items in sorted(results.items(), key=itemgetter(1), reverse=True)[:3]:
+        model_output.append(items[0])
+    precision = calculate_precision(model_output, gold_standard)
+    found = calculate_found(model_output, gold_standard)
+    print(f"{str(query_id)}: {str(precision)}")
+    precision_all += precision
+    found_all += found
+
+print(precision_all / float(len(mappings.keys())))
+print(found_all / float(len(mappings.keys())))
+
+rank_all = 0.0
+
+for query_id in mappings.keys():
+    gold_standard = mappings.get(str(query_id))
+    query = qry_vectors.get(str(query_id))
+    results = {}
+    for doc_id in doc_vectors.keys():
+        document = doc_vectors.get(doc_id)
+        cosine = calculate_cosine(query, document)
+        results[doc_id] = cosine
+    sorted_results = sorted(results.items(), key=itemgetter(1), reverse=True)
+    index = 0
+    found = False
+    while found == False:
+        item = sorted_results[index]
+        index += 1
+        if index == len(sorted_results):
+            found = True
+        if item[0] in gold_standard:
+            found = True
+            print(f"{str(query_id)}: {str(float(1) / float(index))}")
+            rank_all += float(1) / float(index)
+            print(rank_all / float(len(mappings.keys())))
